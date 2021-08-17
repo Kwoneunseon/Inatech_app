@@ -5,11 +5,11 @@ public class ListViewBtnItem {
     private String nameStr;
 
     public void setName(String name){
-        nameStr= name;
+        this.nameStr= name;
     }
 
     public String getName(){
-        return this.nameStr;
+        return nameStr;
     }
 
 }

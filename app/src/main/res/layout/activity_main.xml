@@ -7,19 +7,12 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-
-    <ScrollView
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
-        android:fillViewport="true">
+        android:id="@+id/listview1"/>
 
-
-        <ListView
-            android:id="@+id/listview1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </ScrollView>
 
     <ImageView
         android:id="@+id/plus_btn"

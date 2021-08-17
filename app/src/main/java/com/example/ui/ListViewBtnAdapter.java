@@ -1,5 +1,6 @@
 package com.example.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -8,65 +9,49 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 
 
-public class ListViewBtnAdapter extends ArrayAdapter implements View.OnClickListener{
+public class ListViewBtnAdapter extends RecyclerView.Adapter<ListViewBtnAdapter.CustomViewHolder>{
     String tech_name;
+    private ArrayList<ListViewBtnItem> items = null;
     public static Context context_main;
-    public interface ListBtnClickListener{
-        void onListBtnClick(int position);
+    private Activity context = null;
+    //private ListBtnClickListener listBtnClickListener;
+
+    public ListViewBtnAdapter(Activity context, ArrayList<ListViewBtnItem> list){
+        this.context = context;
+        this.items = list;
     }
-    int resourceId;
-    private ListBtnClickListener listBtnClickListener;
 
-    ListViewBtnAdapter(Context context, int resource, ArrayList<ListViewBtnItem> list, ListBtnClickListener clickListener) {
-        super(context, resource, list) ;
+    class CustomViewHolder extends RecyclerView.ViewHolder{
+        protected Button nameBtn;
+        public CustomViewHolder(@NonNull View view) {
+            super(view);
 
-        // resource id 값 복사. (super로 전달된 resource를 참조할 방법이 없음.)
-        this.resourceId = resource ;
+            this.nameBtn = (Button) view.findViewById(R.id.list_nameBtn);
 
-        this.listBtnClickListener = clickListener ;
-    }
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final int pos = position;
-        final Context context = parent.getContext();
-
-        // 생성자로부터 저장된 resourceId(listview_btn_item)에 해당하는 Layout을 inflate하여 convertView 참조 획득.
-        if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(this.resourceId/*R.layout.listview_btn_item*/, parent, false);
         }
-        final Button nameBtn = (Button) convertView.findViewById(R.id.list_nameBtn);
-
-        final ListViewBtnItem listViewItem = (ListViewBtnItem) getItem(position);
-
-        nameBtn.setText(listViewItem.getName());
-
-        //nameBtn을 선택했을 때
-        nameBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-            tech_name = listViewItem.getName();
-            Intent intent = new Intent(context,SubActivity.class);
-            intent.putExtra("name",tech_name);
-            context.startActivity(intent);
-
-            }
-        });
-        //설정/삭제 버튼을 선택했을 때
-        Button setBtn = (Button) convertView.findViewById(R.id.list_setBtn);
-        setBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-            }
-        });
-        return convertView;
     }
 
     @Override
-    public void onClick(View v) {
-        if(this.listBtnClickListener !=null)
-            this.listBtnClickListener.onListBtnClick((int)v.getTag());
+    public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType){
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.listview_item,null);
+        CustomViewHolder viewHolder = new CustomViewHolder(view);
+
+        return viewHolder;
+    }
+    @Override
+    public void onBindViewHolder(@NonNull CustomViewHolder viewholder, int position){
+        viewholder.nameBtn.setText(items.get(position).getName());
+    }
+
+    @Override
+    public int getItemCount(){
+        return(null!=items?items.size():0);
     }
 }
 

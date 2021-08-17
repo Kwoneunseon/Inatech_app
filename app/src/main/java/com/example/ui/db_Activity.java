@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -26,7 +27,6 @@ public class db_Activity extends AppCompatActivity {
     private static String TAG = "phptest";
 
     private EditText mEditTextName;
-    private EditText mEditTextCountry;
     private TextView mTextViewResult;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,7 +34,6 @@ public class db_Activity extends AppCompatActivity {
         setContentView(R.layout.testdb);
 
         mEditTextName = (EditText)findViewById(R.id.editText_main_name);
-        mEditTextCountry = (EditText)findViewById(R.id.editText_main_country);
         mTextViewResult = (TextView)findViewById(R.id.textView_main_result);
 
         mTextViewResult.setMovementMethod(new ScrollingMovementMethod());
@@ -46,14 +45,11 @@ public class db_Activity extends AppCompatActivity {
             public void onClick(View v) {
 
                 String name = mEditTextName.getText().toString();
-                String country = mEditTextCountry.getText().toString();
 
                 InsertData task = new InsertData();
-                task.execute("http://" + IP_ADDRESS + "/insert.php", name,country);
-
+                task.execute("http://" + IP_ADDRESS + "/insert.php", name);
 
                 mEditTextName.setText("");
-                mEditTextCountry.setText("");
 
             }
         });
@@ -88,10 +84,10 @@ public class db_Activity extends AppCompatActivity {
         protected String doInBackground(String... params) {
 
             String name = (String)params[1];
-            String country = (String)params[2];
 
             String serverURL = (String)params[0];
-            String postParameters = "name=" + name + "&country=" + country;
+            String postParameters = "name=" + name ;
+            Log.d(TAG,name);
 
 
             try {

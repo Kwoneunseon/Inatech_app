@@ -17,16 +17,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/editText_main_name" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Country"
-        android:id="@+id/textView_main_country" />
+<!--    <TextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Country"-->
+<!--        android:id="@+id/textView_main_country" />-->
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/editText_main_country" />
+<!--    <EditText-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:id="@+id/editText_main_country" />-->
 
     <Button
         android:layout_width="match_parent"
