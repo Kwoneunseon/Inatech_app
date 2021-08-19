@@ -21,6 +21,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,6 +39,10 @@ public class SubActivity extends AppCompatActivity {
     private final Timer timer = new Timer();
     private TimerTask mTimerTask;
     int hour=0, min=1  ,sec=50;
+
+    long current_time;
+    Date date;
+    SimpleDateFormat sdf = new SimpleDateFormat("yy/MM/dd hh:mm:ss");
 
     Button timerBtn, recodeBtn, nameBtn;
 
@@ -80,15 +86,26 @@ public class SubActivity extends AppCompatActivity {
                 if (power_check) {//시작
                     iv.setImageResource(R.drawable.red_power);
                     mTimerTask = createTimerTask();
-                    Log.d(TAG,"task는 잘 만들어짐");
                     timer.schedule(mTimerTask, 0, 1000); //Timer 실행
-                    Log.d(TAG,"실행은 잘 됌");
                     power_check = false;
+
+                    //시간 기록
+                    current_time = System.currentTimeMillis();
+                    date = new Date(current_time);
+                    String getTime = sdf.format(date);
+                    Log.d(TAG,"지금 시각 : "+getTime);
+
                 } else {//멈춤
                     iv.setImageResource(R.drawable.gray_power);
                     if(mTimerTask!=null)
                         mTimerTask.cancel();
                     power_check = true;
+
+                    current_time = System.currentTimeMillis();
+                    date = new Date(current_time);
+                    String getTime = sdf.format(date);
+                    Log.d(TAG,"지금 시각 : "+getTime);
+
                 }
             }
             private final Handler mhandler = new Handler(Looper.getMainLooper()){
@@ -128,6 +145,7 @@ public class SubActivity extends AppCompatActivity {
                             // 시분초가 다 0이라면 toast를 띄우고 타이머를 종료한다..
                             if (hour == 0 && min == 0 && sec == 0) {
                                 timer.cancel();//타이머 종료
+                                iv.setImageResource(R.drawable.gray_power);
                             }
                             break;
                     }

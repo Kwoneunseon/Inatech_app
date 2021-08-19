@@ -26,7 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class db_Activity extends AppCompatActivity {
-    private static String IP_ADDRESS ="IP주소";
+    private static String IP_ADDRESS ="192.168.35.28";
     private static String TAG = "phptest";
 
     private EditText mEditTextName;
