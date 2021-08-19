@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,7 +38,6 @@ public class db_Activity extends AppCompatActivity {
 
 
         mEditTextName = (EditText)findViewById(R.id.editText_main_name);
-        //mEditTextCountry = (EditText)findViewById(R.id.editText_main_country);
         mTextViewResult = (TextView)findViewById(R.id.textView_main_result);
 
         mTextViewResult.setMovementMethod(new ScrollingMovementMethod());
@@ -49,14 +49,12 @@ public class db_Activity extends AppCompatActivity {
             public void onClick(View v) {
 
                 String name = mEditTextName.getText().toString();
-                // String country = mEditTextCountry.getText().toString();
 
                 db_Activity.InsertData task = new db_Activity.InsertData();
                 task.execute("http://" + IP_ADDRESS + "/insert.php", name);
 
 
                 mEditTextName.setText("");
-                //mEditTextCountry.setText("");
 
                 Intent mainIntent = new Intent(getApplicationContext(),MainActivity.class);
                 startActivity(mainIntent);
@@ -85,17 +83,14 @@ public class db_Activity extends AppCompatActivity {
             super.onPostExecute(result);
 
             progressDialog.dismiss();
-            mTextViewResult.setText(result);
+            Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG);
             Log.d(TAG, "POST response  - " + result);
         }
-
 
         @Override
         protected String doInBackground(String... params) {
 
             String name = (String)params[1];
-            //String country = (String)params[2];
-
             String serverURL = (String)params[0];
             String postParameters = "name=" + name ;
 
