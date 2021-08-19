@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -29,11 +28,12 @@ public class ListViewBtnAdapter extends RecyclerView.Adapter<ListViewBtnAdapter.
 
     class CustomViewHolder extends RecyclerView.ViewHolder{
         protected Button nameBtn;
+        public final View mView;
         public CustomViewHolder(@NonNull View view) {
             super(view);
 
             this.nameBtn = (Button) view.findViewById(R.id.list_nameBtn);
-
+            this.mView = view;
         }
     }
 
@@ -47,6 +47,18 @@ public class ListViewBtnAdapter extends RecyclerView.Adapter<ListViewBtnAdapter.
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder viewholder, int position){
         viewholder.nameBtn.setText(items.get(position).getName());
+
+        viewholder.nameBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                tech_name = items.get(position).getName();
+                Intent intent = new Intent(v.getContext(),SubActivity.class);
+                intent.putExtra("name",tech_name);
+                context.startActivity(intent);
+            }
+        });
+
+
     }
 
     @Override

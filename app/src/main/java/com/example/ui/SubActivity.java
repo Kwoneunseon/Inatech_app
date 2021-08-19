@@ -64,14 +64,14 @@ public class SubActivity extends AppCompatActivity {
             timerBtn.setText(min+"MIN "+sec+"SEC");
         }
 
-
-        nameBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Intent db_intent = new Intent(getApplicationContext(),db_Activity.class);
-                startActivity(db_intent);
-            }
-        });
+////맨위의 버튼 눌렀을때( 연결할때 사용)
+//        nameBtn.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                Intent db_intent = new Intent(getApplicationContext(),test1_Activity.class);
+//                startActivity(db_intent);
+//            }
+//        });
 
 
         iv.setOnClickListener(new View.OnClickListener() {

@@ -169,7 +169,6 @@ public class MainActivity extends AppCompatActivity  {
 
         String TAG_JSON="systems";
         String TAG_NAME = "name";
-        Log.d(TAG,"showResult에 들어옴");
 
         try {
             JSONObject jsonObject = new JSONObject(mJsonString);

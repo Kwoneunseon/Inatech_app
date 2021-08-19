@@ -1,6 +1,8 @@
 package com.example.ui;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -33,7 +35,9 @@ public class db_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testdb);
 
+
         mEditTextName = (EditText)findViewById(R.id.editText_main_name);
+        //mEditTextCountry = (EditText)findViewById(R.id.editText_main_country);
         mTextViewResult = (TextView)findViewById(R.id.textView_main_result);
 
         mTextViewResult.setMovementMethod(new ScrollingMovementMethod());
@@ -45,11 +49,17 @@ public class db_Activity extends AppCompatActivity {
             public void onClick(View v) {
 
                 String name = mEditTextName.getText().toString();
+                // String country = mEditTextCountry.getText().toString();
 
-                InsertData task = new InsertData();
+                db_Activity.InsertData task = new db_Activity.InsertData();
                 task.execute("http://" + IP_ADDRESS + "/insert.php", name);
 
+
                 mEditTextName.setText("");
+                //mEditTextCountry.setText("");
+
+                Intent mainIntent = new Intent(getApplicationContext(),MainActivity.class);
+                startActivity(mainIntent);
 
             }
         });
@@ -84,10 +94,10 @@ public class db_Activity extends AppCompatActivity {
         protected String doInBackground(String... params) {
 
             String name = (String)params[1];
+            //String country = (String)params[2];
 
             String serverURL = (String)params[0];
             String postParameters = "name=" + name ;
-            Log.d(TAG,name);
 
 
             try {
