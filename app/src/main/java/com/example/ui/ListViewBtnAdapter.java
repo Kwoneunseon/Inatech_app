@@ -19,7 +19,7 @@ public class ListViewBtnAdapter extends RecyclerView.Adapter<ListViewBtnAdapter.
     private ArrayList<ListViewBtnItem> items = null;
     public static Context context_main;
     private Activity context = null;
-    //private ListBtnClickListener listBtnClickListener;
+    private Integer current_id;
 
     public ListViewBtnAdapter(Activity context, ArrayList<ListViewBtnItem> list){
         this.context = context;
@@ -52,8 +52,10 @@ public class ListViewBtnAdapter extends RecyclerView.Adapter<ListViewBtnAdapter.
             @Override
             public void onClick(View v) {
                 tech_name = items.get(position).getName();
+                current_id = items.get(position).getID();
                 Intent intent = new Intent(v.getContext(),SubActivity.class);
                 intent.putExtra("name",tech_name);
+                intent.putExtra("id",current_id);
                 context.startActivity(intent);
             }
         });

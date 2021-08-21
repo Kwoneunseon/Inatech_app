@@ -31,7 +31,8 @@ public class SubActivity extends AppCompatActivity {
     //구동이력 페이지에 넘겨주기 위해서
     public static Context context_sub;
     private Intent intent;
-    String name_cpy;
+    private String name_cpy;
+    private int current_id;
     private final String TAG = "Test";
 
     public static final int TIMER_CODE = 1000;
@@ -61,7 +62,7 @@ public class SubActivity extends AppCompatActivity {
 
         intent = getIntent();
         name_cpy = intent.getStringExtra("name");
-
+        current_id = intent.getIntExtra("id",-1);
         nameBtn.setText(name_cpy);
         if(hour!=0) {
             timerBtn.setText(hour + "Hour " + min + "MIN " + sec + "SEC");
@@ -176,6 +177,8 @@ public class SubActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent recode_intent = new Intent(getApplicationContext(),recode_Activity.class);
+                recode_intent.putExtra("name",name_cpy);
+                recode_intent.putExtra("id",current_id);
                 startActivity(recode_intent);
             }
         });

@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity  {
 
         String TAG_JSON="systems";
         String TAG_NAME = "name";
+        String TAG_ID = "id";
 
         try {
             JSONObject jsonObject = new JSONObject(mJsonString);
@@ -180,10 +181,11 @@ public class MainActivity extends AppCompatActivity  {
                 JSONObject item = jsonArray.getJSONObject(i);
 
                 String name = item.getString(TAG_NAME);
-
+                Integer currnet_id = item.getInt(TAG_ID);
                 ListViewBtnItem listviewBtnitem = new ListViewBtnItem();
 
                 listviewBtnitem.setName(name);
+                listviewBtnitem.setID(currnet_id);
 
                 items.add(listviewBtnitem);
                 adapter.notifyDataSetChanged();
