@@ -1,8 +1,11 @@
 package com.example.ui;
 
 import android.app.Activity;
+import android.app.AsyncNotedAppOp;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,6 +24,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Timer;
@@ -34,6 +43,7 @@ public class SubActivity extends AppCompatActivity {
     private String name_cpy;
     private int current_id;
     private final String TAG = "Test";
+    private static String IP_ADDRESS = "192.168.35.28";
 
     public static final int TIMER_CODE = 1000;
     boolean power_check = true;
@@ -42,10 +52,11 @@ public class SubActivity extends AppCompatActivity {
     int hour=0, min=1  ,sec=50;
 
     long current_time;
-    Date date;
+    private Date date;
     SimpleDateFormat sdf = new SimpleDateFormat("yy/MM/dd hh:mm:ss");
 
     Button timerBtn, recodeBtn, nameBtn;
+    private InsertData task;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -96,6 +107,10 @@ public class SubActivity extends AppCompatActivity {
                     String getTime = sdf.format(date);
                     Log.d(TAG,"지금 시각 : "+getTime);
 
+                    task = new InsertData();
+                    task.execute("http://"+IP_ADDRESS+"/insert_data.php",Integer.toString(current_id),getTime,"start");
+
+
                 } else {//멈춤
                     iv.setImageResource(R.drawable.gray_power);
                     if(mTimerTask!=null)
@@ -106,6 +121,8 @@ public class SubActivity extends AppCompatActivity {
                     date = new Date(current_time);
                     String getTime = sdf.format(date);
                     Log.d(TAG,"지금 시각 : "+getTime);
+                    task = new InsertData();
+                    task.execute("http://"+IP_ADDRESS+"/insert_data.php",Integer.toString(current_id),getTime,"stop");
 
                 }
             }
@@ -147,6 +164,11 @@ public class SubActivity extends AppCompatActivity {
                             if (hour == 0 && min == 0 && sec == 0) {
                                 timer.cancel();//타이머 종료
                                 iv.setImageResource(R.drawable.gray_power);
+
+                                date = new Date(current_time);
+                                String getTime = sdf.format(date);
+                                task = new InsertData();
+                                task.execute("http://"+IP_ADDRESS+"/insert_data.php",Integer.toString(current_id),getTime,"end");
                             }
                             break;
                     }
@@ -172,7 +194,7 @@ public class SubActivity extends AppCompatActivity {
                 startActivityResult.launch(timer_intent);
            }
         });
-        
+
         recodeBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -207,4 +229,95 @@ public class SubActivity extends AppCompatActivity {
                 }
             }
     );
+
+    class InsertData extends AsyncTask<String, Void, String> {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(SubActivity.this,
+                    "Please Wait", null, true, true);
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            Log.d(TAG, "POST response  - " + result);
+        }
+
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String id = (String)params[1];
+            String time = (String)params[2];
+            String state  = (String)params[3];
+
+            String serverURL = (String)params[0];
+            String postParameters = "id=" + id + "&time" + time + "$state" +state;
+
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "POST response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+
+
+                bufferedReader.close();
+
+
+                return sb.toString();
+
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "InsertData: Error ", e);
+
+                return new String("Error: " + e.getMessage());
+            }
+
+        }
+    }
+
+
 }
