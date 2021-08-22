@@ -259,7 +259,7 @@ public class SubActivity extends AppCompatActivity {
             String state  = (String)params[3];
 
             String serverURL = (String)params[0];
-            String postParameters = "id=" + id + "&time" + time + "$state" +state;
+            String postParameters = "id=" + id + "&time=" + time + "&state=" +state;
 
 
             try {
