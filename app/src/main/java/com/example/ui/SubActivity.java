@@ -43,7 +43,7 @@ public class SubActivity extends AppCompatActivity {
     private String name_cpy;
     private int current_id;
     private final String TAG = "Test";
-    private static String IP_ADDRESS = "192.168.35.28";
+ 
 
     public static final int TIMER_CODE = 1000;
     boolean power_check = true;
@@ -108,7 +108,7 @@ public class SubActivity extends AppCompatActivity {
                     Log.d(TAG,"지금 시각 : "+getTime);
 
                     task = new InsertData();
-                    task.execute("http://"+IP_ADDRESS+"/insert_data.php",Integer.toString(current_id),getTime,"start");
+                    task.execute("http://"+MyApplication.IP+"/insert_data.php",Integer.toString(current_id),getTime,"start");
 
 
                 } else {//멈춤
@@ -122,7 +122,7 @@ public class SubActivity extends AppCompatActivity {
                     String getTime = sdf.format(date);
                     Log.d(TAG,"지금 시각 : "+getTime);
                     task = new InsertData();
-                    task.execute("http://"+IP_ADDRESS+"/insert_data.php",Integer.toString(current_id),getTime,"stop");
+                    task.execute("http://"+MyApplication.IP+"/insert_data.php",Integer.toString(current_id),getTime,"stop");
 
                 }
             }
@@ -165,10 +165,11 @@ public class SubActivity extends AppCompatActivity {
                                 timer.cancel();//타이머 종료
                                 iv.setImageResource(R.drawable.gray_power);
 
+                                current_time = System.currentTimeMillis();
                                 date = new Date(current_time);
                                 String getTime = sdf.format(date);
-                                task = new InsertData();
-                                task.execute("http://"+IP_ADDRESS+"/insert_data.php",Integer.toString(current_id),getTime,"end");
+                                Log.d(TAG,"지금 시각 : "+getTime);
+                                task.execute("http://"+MyApplication.IP+"/insert_data.php",Integer.toString(current_id),getTime,"end");
                             }
                             break;
                     }

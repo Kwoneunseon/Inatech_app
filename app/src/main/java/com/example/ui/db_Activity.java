@@ -26,7 +26,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class db_Activity extends AppCompatActivity {
-    private static String IP_ADDRESS ="192.168.35.28";
     private static String TAG = "phptest";
 
     private EditText mEditTextName;
@@ -51,7 +50,7 @@ public class db_Activity extends AppCompatActivity {
                 String name = mEditTextName.getText().toString();
 
                 db_Activity.InsertData task = new db_Activity.InsertData();
-                task.execute("http://" + IP_ADDRESS + "/insert.php", name);
+                task.execute("http://" + MyApplication.IP + "/insert.php", name);
 
 
                 mEditTextName.setText("");

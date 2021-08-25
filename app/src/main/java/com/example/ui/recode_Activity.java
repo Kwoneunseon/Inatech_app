@@ -28,7 +28,6 @@ public class recode_Activity extends AppCompatActivity {
     //구동이력 위에 써주기 위해
 //    String name_cpy = ((SubActivity) SubActivity.context_sub).name_cpy;
 
-    private static String IP_ADDRESS = "192.168.35.28";
     private static String TAG = "phptest";
     private TextView record_list;
     private TextView title;
@@ -53,7 +52,7 @@ public class recode_Activity extends AppCompatActivity {
         title.setText(name_cpy+ " 구동이력");
 
         GetData task = new GetData();
-        task.execute("http://"+IP_ADDRESS+"/getrecord.php","");
+        task.execute("http://"+MyApplication.IP+"/getrecord.php","");
 
     }
 

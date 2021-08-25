@@ -7,6 +7,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,12 +27,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.Socket;
+import java.net.SocketException;
 import java.net.URL;
+import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 //implements ListViewBtnAdapter.ListBtnClickListener
 public class MainActivity extends AppCompatActivity  {
-    private static String IP_ADDRESS ="192.168.35.28";
+
+    //php
     private static String TAG = "phptest";
 
     public static Context context_main;
@@ -45,6 +56,9 @@ public class MainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        //Log.d(TAG,"Ip주소는 :"+getIpAddress());
+
         context_main =this;
         mRecyclerView = (RecyclerView) findViewById(R.id.listview1);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -58,7 +72,7 @@ public class MainActivity extends AppCompatActivity  {
         adapter.notifyDataSetChanged();
 
         GetData task = new GetData();
-        task.execute("http://"+IP_ADDRESS+"/getjson.php","");
+        task.execute("http://"+MyApplication.IP+"/getjson.php","");
 
 
         plus_btn = (ImageView) findViewById(R.id.plus_btn);
@@ -163,6 +177,61 @@ public class MainActivity extends AppCompatActivity  {
 
         }
     }
+
+//   void checkAvailableConnection(){
+//        ConnectivityManager connMgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+//
+//        final android.net.NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+//
+//        final android.net.NetworkInfo mobile = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+//
+//        if(wifi.isAvailable()){
+//            WifiManager myWifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
+//            WifiInfo myWifiInfo = myWifiManager.getConnectionInfo();
+//            int ipAddress = myWifiInfo.getIpAddress();
+//            System.out.println("Wifi 주소는 "+android.text.format.Formatter.formatIpAddress(ipAddress));
+//        }
+//
+//    }
+
+
+//    //IP주소 가져오기
+//    public static String getIpAddress() {
+//        try {
+//            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+//
+//                NetworkInterface intf = en.nextElement();
+//
+//                //네트워크 중에서 IP가 할당된 넘들에 대해서 뺑뺑이를 한 번 더 돕니다.
+//                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+//
+//                    InetAddress inetAddress = enumIpAddr.nextElement();
+//
+//                    //네트워크에는 항상 Localhost 즉, 루프백(LoopBack)주소가 있으며, 우리가 원하는 것이 아닙니다.
+//                    //IP는 IPv6와 IPv4가 있습니다.
+//                    //IPv6의 형태 : fe80::64b9::c8dd:7003
+//                    //IPv4의 형태 : 123.234.123.123
+//                    //어떻게 나오는지는 찍어보세요.
+//                    if (inetAddress.isLoopbackAddress()) {
+//                        Log.i("IPAddress", intf.getDisplayName() + "(loopback) | " + inetAddress.getHostAddress());
+//                    } else {
+//                        Log.i("IPAddress", intf.getDisplayName() + " | " + inetAddress.getHostAddress());
+//                    }
+//
+//                    //루프백이 아니고, IPv4가 맞다면 리턴~~~
+//                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+//                        return inetAddress.getHostAddress().toString();
+//                    }
+//                }
+//            }
+//        }catch (SocketException ex){
+//            ex.printStackTrace();
+//        }
+//        return null;
+//    }
+//
+//
+//
 
 
     private void showResult(){
