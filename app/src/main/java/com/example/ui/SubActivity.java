@@ -169,6 +169,7 @@ public class SubActivity extends AppCompatActivity {
                                 date = new Date(current_time);
                                 String getTime = sdf.format(date);
                                 Log.d(TAG,"지금 시각 : "+getTime);
+                                task = new InsertData();
                                 task.execute("http://"+MyApplication.IP+"/insert_data.php",Integer.toString(current_id),getTime,"end");
                             }
                             break;
