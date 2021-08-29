@@ -84,7 +84,10 @@ public class ListViewBtnAdapter extends RecyclerView.Adapter<ListViewBtnAdapter.
 
                 InsertData task = new InsertData();
                 task.execute("http://" + MyApplication.IP + "/delete.php", Integer.toString(current_id));
-
+                Intent mainIntent = new Intent(v.getContext(),MainActivity.class);
+                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                context.startActivity(mainIntent);
+                context.finish();
 
             }
         });
