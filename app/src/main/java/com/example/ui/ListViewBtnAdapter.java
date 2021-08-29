@@ -55,7 +55,7 @@ public class ListViewBtnAdapter extends RecyclerView.Adapter<ListViewBtnAdapter.
 
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType){
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.listview_item,null);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.listview_item,viewGroup,false);
         CustomViewHolder viewHolder = new CustomViewHolder(view);
 
         return viewHolder;
