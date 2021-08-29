@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_main);
 
 
-        //Log.d(TAG,"Ip주소는 :"+getIpAddress());
+        Log.d(TAG,"Ip주소는 :"+getIpAddress());
 
         context_main =this;
         mRecyclerView = (RecyclerView) findViewById(R.id.listview1);
@@ -81,12 +81,14 @@ public class MainActivity extends AppCompatActivity  {
             @Override
             public void onClick(View v) {
                 Intent db_intent = new Intent(getApplicationContext(),db_Activity.class);
+                //startActivityForResult(db_intent,0);s
                 startActivity(db_intent);
             }
 
         });
 
     }
+
 
     private class GetData extends AsyncTask<String, Void, String> {
 
@@ -195,43 +197,43 @@ public class MainActivity extends AppCompatActivity  {
 //    }
 
 
-//    //IP주소 가져오기
-//    public static String getIpAddress() {
-//        try {
-//            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-//
-//                NetworkInterface intf = en.nextElement();
-//
-//                //네트워크 중에서 IP가 할당된 넘들에 대해서 뺑뺑이를 한 번 더 돕니다.
-//                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
-//
-//                    InetAddress inetAddress = enumIpAddr.nextElement();
-//
-//                    //네트워크에는 항상 Localhost 즉, 루프백(LoopBack)주소가 있으며, 우리가 원하는 것이 아닙니다.
-//                    //IP는 IPv6와 IPv4가 있습니다.
-//                    //IPv6의 형태 : fe80::64b9::c8dd:7003
-//                    //IPv4의 형태 : 123.234.123.123
-//                    //어떻게 나오는지는 찍어보세요.
-//                    if (inetAddress.isLoopbackAddress()) {
-//                        Log.i("IPAddress", intf.getDisplayName() + "(loopback) | " + inetAddress.getHostAddress());
-//                    } else {
-//                        Log.i("IPAddress", intf.getDisplayName() + " | " + inetAddress.getHostAddress());
-//                    }
-//
-//                    //루프백이 아니고, IPv4가 맞다면 리턴~~~
-//                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
-//                        return inetAddress.getHostAddress().toString();
-//                    }
-//                }
-//            }
-//        }catch (SocketException ex){
-//            ex.printStackTrace();
-//        }
-//        return null;
-//    }
-//
-//
-//
+    //IP주소 가져오기
+    public static String getIpAddress() {
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+
+                NetworkInterface intf = en.nextElement();
+                //네트워크 중에서 IP가 할당된 넘들에 대해서 뺑뺑이를 한 번 더 돕니다.
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+
+                    //네트워크에는 항상 Localhost 즉, 루프백(LoopBack)주소가 있으며, 우리가 원하는 것이 아닙니다.
+                    //IP는 IPv6와 IPv4가 있습니다.
+                    //IPv6의 형태 : fe80::64b9::c8dd:7003
+                    //IPv4의 형태 : 123.234.123.123
+                    //어떻게 나오는지는 찍어보세요.
+                    if (inetAddress.isLoopbackAddress()) {
+                        Log.d(TAG,"뭐야 왜 안돼 ㅅㅂ..");
+                        Log.i("IPAddress", intf.getDisplayName() + "(loopback) | " + inetAddress.getHostAddress());
+                    } else {
+                        Log.i("IPAddress", intf.getDisplayName() + " | " + inetAddress.getHostAddress());
+                    }
+
+                    //루프백이 아니고, IPv4가 맞다면 리턴~~~
+                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                        return inetAddress.getHostAddress().toString();
+                    }
+                }
+            }
+        }catch (SocketException ex){
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+
+
 
 
     private void showResult(){

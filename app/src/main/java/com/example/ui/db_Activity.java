@@ -35,7 +35,6 @@ public class db_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testdb);
 
-
         mEditTextName = (EditText)findViewById(R.id.editText_main_name);
         mTextViewResult = (TextView)findViewById(R.id.textView_main_result);
 
@@ -56,7 +55,10 @@ public class db_Activity extends AppCompatActivity {
                 mEditTextName.setText("");
 
                 Intent mainIntent = new Intent(getApplicationContext(),MainActivity.class);
+                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(mainIntent);
+                finish();
+
 
             }
         });

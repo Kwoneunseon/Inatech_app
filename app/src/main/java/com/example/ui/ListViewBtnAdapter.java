@@ -29,6 +29,7 @@ public class ListViewBtnAdapter extends RecyclerView.Adapter<ListViewBtnAdapter.
     private ArrayList<ListViewBtnItem> items = null;
     public static Context context_main;
     private Activity context = null;
+    public static String TAG = "phptest";
     private Integer current_id;
 
 
@@ -39,13 +40,13 @@ public class ListViewBtnAdapter extends RecyclerView.Adapter<ListViewBtnAdapter.
 
     class CustomViewHolder extends RecyclerView.ViewHolder{
         protected Button nameBtn;
-        //protected Button deleteBtn;
+        protected Button deleteBtn;
         public final View mView;
         public CustomViewHolder(@NonNull View view) {
             super(view);
 
             this.nameBtn = (Button) view.findViewById(R.id.list_nameBtn);
-            //this.deleteBtn =(Button)view.findViewById(R.id.list_deleteBtn);
+            this.deleteBtn =(Button)view.findViewById(R.id.list_deleteBtn);
             this.mView = view;
         }
 
@@ -75,15 +76,18 @@ public class ListViewBtnAdapter extends RecyclerView.Adapter<ListViewBtnAdapter.
             }
         });
 
-//        viewholder.deleteBtn.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//
-//                InsertData task = new InsertData();
-//                task.execute("http://" + MyApplication.IP + "/delete.php", Integer.toString(current_id));
-//
-//            }
-//        });
+        viewholder.deleteBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                current_id = items.get(position).getID();
+
+                InsertData task = new InsertData();
+                task.execute("http://" + MyApplication.IP + "/delete.php", Integer.toString(current_id));
+
+
+            }
+        });
 
 
 
@@ -97,91 +101,91 @@ public class ListViewBtnAdapter extends RecyclerView.Adapter<ListViewBtnAdapter.
     public int getItemCount(){
         return(null!=items?items.size():0);
     }
+
+    class InsertData extends AsyncTask<String, Void, String> {
+        //ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            //progressDialog = ProgressDialog.show(db_Activity.this,
+            //        "Please Wait", null, true, true);
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            //progressDialog.dismiss();
+            // Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG);
+            Log.d(TAG, "POST response  - " + result);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String id = (String)params[1];
+            String serverURL = (String)params[0];
+            String postParameters = "id=" + id ;
+
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "POST response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+
+
+                bufferedReader.close();
+
+
+                return sb.toString();
+
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "DeleteData: Error ", e);
+
+                return new String("Error: " + e.getMessage());
+            }
+
+        }
+    }
 }
-//
-//class InsertData extends AsyncTask<String, Void, String> {
-//    ProgressDialog progressDialog;
-//    public static String TAG = "phptest";
-//
-//    @Override
-//    protected void onPreExecute() {
-//        super.onPreExecute();
-//
-//        //progressDialog = ProgressDialog.show(db_Activity.this,
-//        //        "Please Wait", null, true, true);
-//    }
-//
-//
-//    @Override
-//    protected void onPostExecute(String result) {
-//        super.onPostExecute(result);
-//
-//        progressDialog.dismiss();
-//        // Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG);
-//        Log.d(TAG, "POST response  - " + result);
-//    }
-//
-//    @Override
-//    protected String doInBackground(String... params) {
-//
-//        String id = (String)params[1];
-//        String serverURL = (String)params[0];
-//        String postParameters = "id=" + id ;
-//
-//
-//        try {
-//
-//            URL url = new URL(serverURL);
-//            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-//
-//
-//            httpURLConnection.setReadTimeout(5000);
-//            httpURLConnection.setConnectTimeout(5000);
-//            httpURLConnection.setRequestMethod("POST");
-//            httpURLConnection.connect();
-//
-//
-//            OutputStream outputStream = httpURLConnection.getOutputStream();
-//            outputStream.write(postParameters.getBytes("UTF-8"));
-//            outputStream.flush();
-//            outputStream.close();
-//
-//
-//            int responseStatusCode = httpURLConnection.getResponseCode();
-//            Log.d(TAG, "POST response code - " + responseStatusCode);
-//
-//            InputStream inputStream;
-//            if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-//                inputStream = httpURLConnection.getInputStream();
-//            }
-//            else{
-//                inputStream = httpURLConnection.getErrorStream();
-//            }
-//
-//
-//            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-//            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-//
-//            StringBuilder sb = new StringBuilder();
-//            String line = null;
-//
-//            while((line = bufferedReader.readLine()) != null){
-//                sb.append(line);
-//            }
-//
-//
-//            bufferedReader.close();
-//
-//
-//            return sb.toString();
-//
-//
-//        } catch (Exception e) {
-//
-//            Log.d(TAG, "InsertData: Error ", e);
-//
-//            return new String("Error: " + e.getMessage());
-//        }
-//
-//    }
-//}
+
