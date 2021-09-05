@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.AsyncNotedAppOp;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +18,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 
+
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -25,11 +28,18 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Timer;
@@ -57,6 +67,16 @@ public class SubActivity extends AppCompatActivity {
 
     Button timerBtn, recodeBtn, nameBtn;
     private InsertData task;
+
+    // 아두이노 연결
+    private static final String TAG_T = "TCPClient";
+    private boolean isConnected = false;
+
+    private String mServerIP = null;
+    private Socket mSocket = null;
+    private PrintWriter mOut;
+    private BufferedReader mIn;
+    private Thread mReceiverThread = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -95,7 +115,7 @@ public class SubActivity extends AppCompatActivity {
         iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (power_check) {//시작
+                if (power_check) {//시작 (ON)
                     iv.setImageResource(R.drawable.red_power);
                     mTimerTask = createTimerTask();
                     timer.schedule(mTimerTask, 0, 1000); //Timer 실행
@@ -111,7 +131,10 @@ public class SubActivity extends AppCompatActivity {
                     task.execute("http://"+MyApplication.IP+"/insert_data.php",Integer.toString(current_id),getTime,"start");
 
 
-                } else {//멈춤
+                    //와이파이 모듈에 ON데이터 전송
+                    new Thread(new SenderThread("ON")).start();
+
+                } else {//멈춤(OFF)
                     iv.setImageResource(R.drawable.gray_power);
                     if(mTimerTask!=null)
                         mTimerTask.cancel();
@@ -124,6 +147,7 @@ public class SubActivity extends AppCompatActivity {
                     task = new InsertData();
                     task.execute("http://"+MyApplication.IP+"/insert_data.php",Integer.toString(current_id),getTime,"stop");
 
+                    new Thread(new SenderThread("OFF")).start();
                 }
             }
             private final Handler mhandler = new Handler(Looper.getMainLooper()){
@@ -171,6 +195,8 @@ public class SubActivity extends AppCompatActivity {
                                 Log.d(TAG,"지금 시각 : "+getTime);
                                 task = new InsertData();
                                 task.execute("http://"+MyApplication.IP+"/insert_data.php",Integer.toString(current_id),getTime,"end");
+
+                                new Thread(new SenderThread("OFF")).start();
                             }
                             break;
                     }
@@ -206,6 +232,8 @@ public class SubActivity extends AppCompatActivity {
                 startActivity(recode_intent);
             }
         });
+        //와이파이 모듈과 연결을 위해
+        new Thread(new ConnectThread("49.174.58.125",8080)).start();
     }
 
     ActivityResultLauncher<Intent> startActivityResult = registerForActivityResult(
@@ -319,6 +347,168 @@ public class SubActivity extends AppCompatActivity {
             }
 
         }
+    }
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+
+        isConnected =false;
+    }
+
+    private class ConnectThread implements Runnable {
+
+        private String serverIP;
+        private int serverPort;
+
+        ConnectThread(String ip, int port) {
+            serverIP = ip;
+            serverPort = port;
+
+            //mConnectionStatus.setText("connecting to " + serverIP + ".......");
+        }
+        @Override
+        public void run() {
+
+            try {
+
+                mSocket = new Socket(serverIP, serverPort);
+                //ReceiverThread: java.net.SocketTimeoutException: Read timed out 때문에 주석처리
+                //mSocket.setSoTimeout(3000);
+
+                mServerIP = mSocket.getRemoteSocketAddress().toString();
+
+            } catch( UnknownHostException e )
+            {
+                Log.d(TAG,  "ConnectThread: can't find host");
+            }
+            catch( SocketTimeoutException e )
+            {
+                Log.d(TAG, "ConnectThread: timeout");
+            }
+            catch (Exception e) {
+
+                Log.e(TAG, ("ConnectThread:" + e.getMessage()));
+            }
+
+
+            if (mSocket != null) {
+
+                try {
+
+                    mOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream(), "UTF-8")), true);
+                    mIn = new BufferedReader(new InputStreamReader(mSocket.getInputStream(), "UTF-8"));
+
+                    isConnected = true;
+                } catch (IOException e) {
+
+                    Log.e(TAG, ("ConnectThread:" + e.getMessage()));
+                }
+            }
+
+
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    //연결되었을 때
+                    if (isConnected) {
+
+                        Log.d(TAG, "connected to " + serverIP);
+                        //mConnectionStatus.setText("connected to " + serverIP);
+
+                        mReceiverThread = new Thread(new ReceiverThread());
+                        mReceiverThread.start();
+                    }else{
+                        //연결안됨.
+
+                        Log.d(TAG, "failed to connect to server " + serverIP);
+                        //mConnectionStatus.setText("failed to connect to server "  + serverIP);
+                    }
+
+                }
+            });
+        }
+    }
+    private class SenderThread implements Runnable {
+
+        private String msg;
+
+        SenderThread(String msg) {
+            this.msg = msg;
+        }
+
+        @Override
+        public void run() {
+
+            mOut.println(this.msg);
+            mOut.flush();
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "send message: " + msg);
+                    //mConversationArrayAdapter.insert("Me - " + msg, 0);
+                }
+            });
+        }
+    }
+
+
+    private class ReceiverThread implements Runnable {
+
+        @Override
+        public void run() {
+
+            try {
+
+                while (isConnected) {
+
+                    if ( mIn ==  null ) {
+
+                        Log.d(TAG, "ReceiverThread: mIn is null");
+                        break;
+                    }
+
+                    final String recvMessage =  mIn.readLine();
+
+                    if (recvMessage != null) {
+
+                        runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+
+                                Log.d(TAG, "recv message: "+recvMessage);
+                                //mConversationArrayAdapter.insert(mServerIP + " - " + recvMessage, 0);
+                            }
+                        });
+                    }
+                }
+
+                Log.d(TAG, "ReceiverThread: thread has exited");
+                if (mOut != null) {
+                    mOut.flush();
+                    mOut.close();
+                }
+
+                mIn = null;
+                mOut = null;
+
+                if (mSocket != null) {
+                    try {
+                        mSocket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            catch (IOException e) {
+
+                Log.e(TAG, "ReceiverThread: "+ e);
+            }
+        }
+
     }
 
 
